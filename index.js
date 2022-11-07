@@ -1,14 +1,31 @@
-var API_KEY = '4253ae682bded8fe54667e18d996e279'
+var API_KEY = '500315c8473f75376f0ad6eb7eed421c'
 
-function getGeoLocation(query) { 
-    return fetch('http://api.openweathermap.org/geo/1.0/direct?q=${query}&limit={limit}&appid=${API_KEY}')
+function getGeoLocation(query, limit = 5) { 
+    return fetch('http://api.openweathermap.org/geo/1.0/direct?q=${query}&limit=${limit}&appid=${API_KEY}')
+    
 }
 
+function getCurrentWeather({arguments}) { 
+    return fetch('https://api.openweathermap.org/data/3.0/onecall?lat=${arguments.lat}&lon=${arguments.lon}&units=${arguments.units}&appid=${API_KEY}')
+}
+
+
+// Using a function that returns a promise, which is to fetch the api geolocator 
 getGeoLocation('Long Beach')
-.then(response => response.json())
-.then(data=> { 
-    body.textContent = Json.stringify(data, null, 2)
+.then(function(response) {
+    return response.json
+})
+.then(data=> {
+    getCurrentWeather({ lat: data[0].lat, lon: data[0].lon })
+    .then(weatherResponse => weatherResponse.json())
+    .then(weatherData => { 
+        document.body.textContent = JSONstringify(weatherData, null, 2)
+    })
+    .catch(error => { 
+        document.body.textContent = error.message
+    })
 })
 .catch(error => { 
-    body.textContent = error.massage
-}) 
+    document.body.textContent = error.message
+})
+
