@@ -35,8 +35,20 @@ var API_KEY = "500315c8473f75376f0ad6eb7eed421c"
 // Can get the city locations
 function getGeoLocation(query, limit = 5) {
     console.log(API_KEY); 
-    return fetch ((`http://api.openweathermap.org/geo/1.0/direct?q=${query},${queryII}&limit=${limit=5}&appid=${API_KEY}`) 
+    return fetch ((`http://api.openweathermap.org/geo/1.0/direct?q=${query}&limit=${limit=5}&appid=${API_KEY}`) 
     ); 
+}
+
+function getLocation(callback) { 
+    console.log('this work?')
+    if (navigator.geolocation) { 
+        navigator.geolocation.getCurrentPosition(function(position) {
+            console.log(position)
+            callback(position)
+        });
+    } else { 
+        console.log('Nope!')
+    }
 }
 
 function addtoHistory(location) {
@@ -63,22 +75,32 @@ function createWeatherDisplay(location) {
     .then(function(response) { 
         return response.json()
     })
-    .then(data => { 
-        console.log(data) 
+    .then(data=> { 
+        console.log(data)
         if (data.length === 0) { 
-            var erroEl = document.createElement('p') 
-            erroEl.textContent = `We couldn't find ${location}` 
-            document.body.appendChild(erroEL)
-        } else { 
-            getCurrentWeather({ lat: data[0].lat, lon: data[0].lon})
-            .then(weatherResponse => weatherResponse.json())
-            .then(weatherData => { 
-                var weatherPicture = document.createElement('img')
-                weatherPicture.src = `http://openweathermap.org/img/wn/${weatherData}.weather[0].icon}@2x.png`
-            })
-        }
-    }
-)}
+         var errorEl = document.createElement('p')
+         errorEl.textContent = `We couldn't find ${location}`
+         document.body.appendChild(errorEl)
+        } else {
+         getCurrentWeather({ lat: data[0].lat, lon: data[0].lon})
+        .then(weatherResponse => weatherResponse.json())
+        .then(weatherData => { 
+         var weatherPicture = document.createElement('img') 
+         weatherPicture.src = `http://openweathermap.org/img/wn/${weatherData.weather[0].icon}@2x.png`
+         var currentWeatherStatement = document.createElement('p')
+         currentWeatherStatement.textContent = `${weatherData.weather[0].main}: it is currently ${weatherData.weather}`
+         document.body.appendChild(weatherPicture)
+         document.body.appendChild(currentWeatherStatement)
+        })
+        .catch(error => { 
+         document.body.textContent = error.message
+        })
+     }
+     })
+     .catch(error => { 
+         document.body.textContent = error.message
+     });
+    }     
 
 // Grabbing the weather 
 function getWeather(event) { 
@@ -88,6 +110,17 @@ function getWeather(event) {
         currentWeather(city); 
     }
 }
+
+var current = getLocation(function(current) { 
+    getCurrentWeather ({ lat: current.coords.lattitude, lon: current.coords.longitude})
+    .then(weatherRepsonse => weatherResponse.json())
+    .then(weatherData => { 
+        displayWeatherData(weatherData)
+    })
+    .catch(error => { 
+        document.body.textContent = error.message
+    })
+})
 
 // Will get the current weather from the locations through the weather api 
 // Use Insomnia to test API 
@@ -102,39 +135,10 @@ function getCurrentWeather(city) {
 } 
 
 // Gonna need to create a variable that can call all the states in the US to be used in the argument
-getCurrentWeather('city')
+getCurrentWeather('city') 
 .then(function(response) {
-    return response.json()
 }) 
-.then(data=> { 
-   console.log(data)
-   getCurrentWeather({ lat: data[0].lat, lon: data[0].lon})
-   .then(weatherResponse => weatherResponse.json())
-   .then(weatherData => { 
-    var weatherPicture = document.createElement('img') 
-    weatherPicture.src = `http://openweathermap.org/img/wn/${weatherData.weather[0].icon}@2x.png`
-    var currentWeatherStatement = document.createElement('p')
-    currentWeatherStatement.textContent = `${weatherData.weather[0].main}: it is currently ${weatherData.weather}`
-    document.body.appendChild(weatherPicture)
-    document.body.appendChild(currentWeatherStatement)
-   })
-})
-.catch(error => { 
-    document.body.textContent = error.message
-});
 
-function displayButtons() { 
-    var savedSearches = JSON.parse(localStorage.getItem("locations")) || []; 
-    for (var i = 0; i < savedSearches.length; i++) { 
-        var city = savedSearches[i].city;
-        var state = savedSearches[i].state;
-        console.log(savedSearches);
-        // Insert button to search for City 
-        var cityBtn = $("<button></button>");
-        var historyTextEl = $("<h2></h2>"); 
-        historyTextEl.text("your history is");
-    }
-}
 
 
 
