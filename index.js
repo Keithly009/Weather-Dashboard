@@ -42,6 +42,7 @@ function getGeoLocation(query, limit = 5) {
 function getLocation(callback) { 
     console.log('this work?')
     if (navigator.geolocation) { 
+        console.log('this did work')
         navigator.geolocation.getCurrentPosition(function(position) {
             console.log(position)
             callback(position)
