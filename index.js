@@ -39,14 +39,19 @@ function getGeoLocation(query, limit = 5) {
     ); 
 }
 
+function getCurrentWeather(arguments) { 
+    return fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${arguments.lat}&lon=${arguments.lon}&units=${'imperial'}&appid=${API_KEY}`)
+}
+
 function getLocation(callback) { 
     console.log('this work?')
     if (navigator.geolocation) { 
         console.log('this did work')
-        navigator.geolocation.getCurrentPosition(function(position) {
-            console.log(position)
-            callback(position)
-        });
+        return navigator.geolocation.getCurrentPosition(
+            callback,
+            (error) => console.log(error)
+      
+        );
     } else { 
         console.log('Nope!')
     }
@@ -117,6 +122,7 @@ var current = getLocation(function(current) {
     .then(weatherRepsonse => weatherResponse.json())
     .then(weatherData => { 
         displayWeatherData(weatherData)
+        document.querySelector('#loading').remove()
     })
     .catch(error => { 
         document.body.textContent = error.message
@@ -128,7 +134,7 @@ var current = getLocation(function(current) {
 function getCurrentWeather(city) {
      console.log(city) 
      console.log(API_KEY) 
-    return fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&appid=${API_KEY}`)
+    return fetch(`https://api.openweathermap.org/data/2.5/weather?lat=44.34&lon=10.99&appid=${API_KEY}`)
     .then(res => res.json()) 
     .then(function(response){ 
         console.log(response) 
